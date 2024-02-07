@@ -12,7 +12,7 @@ import sqlconn
 
 # @todo: get rid of debug/test values
 TEST_USER_ID = 1
-#endregion
+# endregion
 
 # mixer allows us to load sounds
 # I have no idea what these mean, Coding with Russ on Youtube set these arguments like this
@@ -20,8 +20,9 @@ pg.mixer.pre_init(44100, -16, 2, 512)
 mixer.init()
 pg.init()
 
-# region general setup
+# region setup
 
+# region screen setup
 SCREEN_WIDTH = 928
 SCREEN_HEIGHT = 793
 BACKGROUND = pg.image.load('./Backgrounds/Free Pixel Art Forest/Preview/Background.png')
@@ -29,15 +30,9 @@ BACKGROUND = pg.image.load('./Backgrounds/Free Pixel Art Forest/Preview/Backgrou
 screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pg.display.set_caption('Sit, Boy!')
 random.seed()
-
-sqlEventHandler = sqlconn.SqlConn("", "", "", "")
-
-game_running = True
-menu_running = True
 # endregion
 
 # region font setup
-
 white = (255, 255, 255)
 black = (0, 0, 0)
 red = (200, 0, 0)
@@ -55,12 +50,33 @@ conclusion_text_rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2)
 
 thankyou_text = sans_bold_font.render('Thank you for participating!', True, white, black)
 thankyou_text_rect = thankyou_text.get_rect()
-thankyou_text_rect.center = (SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + font_size*1.25)
+thankyou_text_rect.center = (
+	SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2 + font_size*1.25)
 # endregion
+
+# region SQL setup
+sqlEventHandler = sqlconn.SqlConn("", "", "", "")
+# endregion
+# endregion
+
+game_running = True
+menu_running = True
 
 # region main methods
 def input_is_correct(key, is_sitting):
 	return is_sitting and (key == pg.K_KP_ENTER or key == pg.K_RETURN or key == pg.MOUSEBUTTONDOWN)
+
+def shuffle_animations(anilist):
+	while not list_is_good(anilist):
+		random.shuffle(anilist)
+	return anilist
+
+def list_is_good(anilist):
+	for i in range(len(anilist) - 2):
+		if anilist[i][0] == dog.Actions.SIT_IDLE.value and anilist[i+1][0] == dog.Actions.SIT_IDLE.value:
+			return False
+	return True
+	
 # endregion
 
 # region game menu
@@ -114,9 +130,10 @@ if game_running:
 	sqlEventHandler.new_player_login(TEST_USER_ID)
 
 # region sound management
-	
+
 # load game music
-pg.mixer.music.load('Music/Abstraction - Ludum Dare 28 Loops/Ludum Dare 28 - Track 8.wav')
+pg.mixer.music.load(
+	'Music/Abstraction - Ludum Dare 28 Loops/Ludum Dare 28 - Track 8.wav')
 pg.mixer.music.set_volume(.5)  # 50% original volume
 pg.mixer.music.play(-1, 0.0, 5000)
 
@@ -124,29 +141,65 @@ pg.mixer.music.play(-1, 0.0, 5000)
 reward_fx = pg.mixer.Sound('sfx/game/MI_SFX 43.wav')
 
 goodboi_dest = (SCREEN_WIDTH / 2 - 100, SCREEN_HEIGHT - 160)
-goodboi = dog.Dog(dog.Directions.LEFT.value, dog.Actions.STAND_IDLE.value, goodboi_dest)
+goodboi = dog.Dog(dog.Directions.LEFT.value,
+				  dog.Actions.STAND_IDLE.value, goodboi_dest)
 # endregion
 
-# region setup animation list
+# region setup animation distributions
 
-# 13 animations: 5 sits, 2 of each other relevant one.
-animation_list = [(dog.Actions.STAND_IDLE.value, 2.5),
-				  (dog.Actions.RUN.value, 2),
-				  (dog.Actions.SIT_IDLE.value, 1), # sit_idle
-				  (dog.Actions.LICK.value, 3),
-				  (dog.Actions.SIT_IDLE.value, 1.5), # sit_idle
-				  (dog.Actions.STAND_IDLE.value, 3),
-				  (dog.Actions.RUN.value, 2),
-				  (dog.Actions.SIT_IDLE.value, 1), # sit_idle
-				  (dog.Actions.WALK.value, 3),
-				  (dog.Actions.SIT_IDLE.value, 4), # sit_idle
-				  (dog.Actions.LICK.value, 3),
-				  (dog.Actions.WALK.value, 1),
-				  (dog.Actions.SIT_IDLE.value, 3)] # sit_idle
+# @todo: shuffle the animations to add randomization between plays
+# level 1: sit idle and stand idle
+level_1 = [(dog.Actions.STAND_IDLE.value, 2.5),
+		   (dog.Actions.STAND_IDLE.value, 2),
+		   (dog.Actions.STAND_IDLE.value, 3),
+		   (dog.Actions.STAND_IDLE.value, 3),
+		   (dog.Actions.STAND_IDLE.value, 2),
+		   (dog.Actions.STAND_IDLE.value, 3),
+		   (dog.Actions.STAND_IDLE.value, 1),
+		   (dog.Actions.STAND_IDLE.value, 3),
+		   (dog.Actions.SIT_IDLE.value, 1),  # sit_idle
+		   (dog.Actions.SIT_IDLE.value, 1.5),  # sit_idle
+		   (dog.Actions.SIT_IDLE.value, 1),  # sit_idle
+		   (dog.Actions.SIT_IDLE.value, 4),  # sit_idle
+		   (dog.Actions.SIT_IDLE.value, 3)]  # sit_idle
+level_1 = shuffle_animations(level_1)
+print(level_1)
 
-list_index = 1 # start at next animation
+# level 2: sit idle, stand idle, walk
+level_2 = [(dog.Actions.STAND_IDLE.value, 2.5),
+		   (dog.Actions.STAND_IDLE.value, 2),
+		   (dog.Actions.STAND_IDLE.value, 3),
+		   (dog.Actions.STAND_IDLE.value, 3),
+		   (dog.Actions.WALK.value, 2),
+		   (dog.Actions.WALK.value, 3),
+		   (dog.Actions.WALK.value, 1),
+		   (dog.Actions.WALK.value, 3),
+		   (dog.Actions.SIT_IDLE.value, 1),  # sit_idle
+		   (dog.Actions.SIT_IDLE.value, 1.5),  # sit_idle
+		   (dog.Actions.SIT_IDLE.value, 1),  # sit_idle
+		   (dog.Actions.SIT_IDLE.value, 4),  # sit_idle
+		   (dog.Actions.SIT_IDLE.value, 3)]  # sit_idle
+level_2 = shuffle_animations(level_2)
+
+# level 3: sit idle, stand idle, walk, lick
+level_3 = [(dog.Actions.STAND_IDLE.value, 2.5),
+		   (dog.Actions.STAND_IDLE.value, 2),
+		   (dog.Actions.STAND_IDLE.value, 3),
+		   (dog.Actions.LICK.value, 3),
+		   (dog.Actions.LICK.value, 1),
+		   (dog.Actions.LICK.value, 2),
+		   (dog.Actions.WALK.value, 3),
+		   (dog.Actions.WALK.value, 1),
+		   (dog.Actions.WALK.value, 3),
+		   (dog.Actions.SIT_IDLE.value, 1.5),  # sit_idle
+		   (dog.Actions.SIT_IDLE.value, 1),  # sit_idle
+		   (dog.Actions.SIT_IDLE.value, 4),  # sit_idle
+		   (dog.Actions.SIT_IDLE.value, 3)]  # sit_idle
+level_3 = shuffle_animations(level_3)
+
+list_index = 0
 last_update = pg.time.get_ticks()
-action_change_time = 1000 * animation_list[0][1] # milliseconds
+action_change_time = 1000 * level_1[0][1]  # milliseconds
 # endregion
 
 # region game loop
@@ -155,17 +208,17 @@ while game_running:
 	screen.blit(BACKGROUND, (0, 0))
 
 	current_time = pg.time.get_ticks()
-	if current_time - last_update >= action_change_time and list_index < len(animation_list):
-		goodboi.set_action(animation_list[list_index][0])
+	if current_time - last_update >= action_change_time and list_index < len(level_1):
+		goodboi.set_action(level_1[list_index][0])
 		last_update = current_time
 		sqlEventHandler.animation_change(TEST_USER_ID, goodboi.get_action())
-		action_change_time = 1000 * animation_list[list_index][1] # milliseconds
+		action_change_time = 1000 * level_1[list_index][1]  # milliseconds
 		list_index += 1
 
 	# update animation
 	goodboi.update_animation(screen)
 
-	if list_index >= len(animation_list):
+	if list_index >= len(level_1):
 		screen.blit(conclusion_text, conclusion_text_rect)
 		screen.blit(thankyou_text, thankyou_text_rect)
 
@@ -191,7 +244,7 @@ while game_running:
 			# @todo: delet this
 			# hit backslash to test experiment-end code
 			elif event.key == pg.K_BACKSLASH:
-				list_index = len(animation_list)
+				list_index = len(level_1)
 
 	pg.display.update()
 # endregion
