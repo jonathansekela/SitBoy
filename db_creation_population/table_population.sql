@@ -15,3 +15,9 @@ values ("White / Caucasian");
 
 insert into ethnicities (eth_description)
 values ("Multiple ethnicity/ Other (please specify)");
+
+insert into games (game_id, game_name, game_desc)
+values (1, "Sit, Boy!", "game to test reaction times for reinforcement learning");
+
+insert into games (game_id, game_name, game_desc)
+values (2, "Target Practice", "game to help user improve reaction times");

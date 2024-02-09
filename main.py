@@ -1,12 +1,11 @@
 #!/usr/bin/env python
 
-import mysql.connector as conn
 import pygame as pg
 from pygame import mixer
 import random
 import button
 import dog
-import sqlconn
+import sitboy_sqlconn
 
 # region debug/test values
 
@@ -21,6 +20,7 @@ mixer.init()
 pg.init()
 
 # region setup
+GAME_ID = 1
 
 # region screen setup
 SCREEN_WIDTH = 928
@@ -55,7 +55,7 @@ thankyou_text_rect.center = (
 # endregion
 
 # region SQL setup
-sqlEventHandler = sqlconn.SqlConn("", "", "", "")
+sqlEventHandler = sitboy_sqlconn.SitBoySqlConn("", "", "", "")
 # endregion
 # endregion
 
@@ -76,7 +76,6 @@ def list_is_good(anilist):
 		if anilist[i][0] == dog.Actions.SIT_IDLE.value and anilist[i+1][0] == dog.Actions.SIT_IDLE.value:
 			return False
 	return True
-	
 # endregion
 
 # region game menu
@@ -146,8 +145,6 @@ goodboi = dog.Dog(dog.Directions.LEFT.value,
 # endregion
 
 # region setup animation distributions
-
-# @todo: shuffle the animations to add randomization between plays
 # level 1: sit idle and stand idle
 level_1 = [(dog.Actions.STAND_IDLE.value, 2.5),
 		   (dog.Actions.STAND_IDLE.value, 2),
