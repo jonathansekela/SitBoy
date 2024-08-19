@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import pygame as pg
+import pyjsdl as pg
 import spritesheet
 import spritesfunctions as sf
 from enum import Enum
@@ -7,18 +7,29 @@ import random
 
 # region enums
 
-class Directions(Enum):
-	LEFT = 0
-	RIGHT = 1
+class Directions():
+	def __init__(self):
+		self.LEFT = 0
+		self.LEFT_NAME = "left"
+		self.RIGHT = 1
+		self.RIGHT_NAME = "right"
 
-class Actions(Enum):
-	LICK = 0
-	WALK = 1
-	RUN = 2
-	SIT = 3
-	SIT_IDLE = 4
-	STAND_IDLE = 5
-	STAND = 6
+class Actions():
+	def __init__(self):
+		self.LICK = 0
+		self.LICK_NAME = "lick"
+		self.WALK = 1
+		self.WALK_NAME = "walk"
+		self.RUN = 2
+		self.RUN_NAME = "run"
+		self.SIT = 3
+		self.SIT_NAME = "sit"
+		self.SIT_IDLE = 4
+		self.SIT_IDLE_NAME = "sit idle"
+		self.STAND_IDLE = 5
+		self.STAND_IDLE_NAME = "stand idle"
+		self.STAND = 6
+		self.STAND_NAME = "stand"
 # endregion
 
 class Dog():
@@ -36,6 +47,8 @@ class Dog():
 		self.SPRITE_WIDTH = 60
 		self.SPRITE_HEIGHT = 38
 		self.BLACK = (0, 0, 0)
+		self.Dirs = Directions()
+		self.Acts = Actions()
 		# number of frames in each animation
 		self.ANIMATION_STEPS = [4, 6, 5, 3, 4, 4]
 		self.NUM_ANIMATIONS = 7  # lick, walk, run, sit, sit idle, stand idle, stand
@@ -65,7 +78,7 @@ class Dog():
 		return self.direction
 
 	def get_action(self):
-		if self.direction == Directions.LEFT.value:
+		if self.direction == self.Dirs.LEFT:
 			return self.action
 		else:
 			return self.action - self.NUM_ANIMATIONS
@@ -85,7 +98,7 @@ class Dog():
 
 # region mutators
 	def set_direction(self, direction):
-		if direction == Directions.LEFT.value or direction == Directions.RIGHT.value:
+		if direction == self.Dirs.LEFT or direction == self.Dirs.RIGHT:
 			self.direction = direction
 		else:
 			raise Exception("invalid value for direction: ", direction)
@@ -100,7 +113,7 @@ class Dog():
 
 # region class utility functions
 	def __change_action(self, new_action):
-		if self.direction == Directions.LEFT.value:
+		if self.direction == self.Dirs.LEFT:
 			self.action = new_action
 			self.frame = 0
 		else:
@@ -112,7 +125,7 @@ class Dog():
 
 	def change_action_random_exclude_transitions_sit_idle(self):
 		new_action = -1
-		while new_action == -1 or new_action == Actions.SIT.value or new_action == Actions.STAND.value or new_action == Actions.SIT_IDLE.value:
+		while new_action == -1 or new_action == self.Acts.SIT or new_action == self.Acts.STAND or new_action == self.Acts.SIT_IDLE:
 			new_action = random.randint(0, self.NUM_ANIMATIONS - 1)
 		self.__change_action(new_action)
 
@@ -133,71 +146,71 @@ class Dog():
 
 # region change directions
 	def turn_left(self):
-		self.direction = Directions.LEFT.value
+		self.direction = self.Dirs.LEFT
 		if self.action >= self.NUM_ANIMATIONS:
 			self.action -= self.NUM_ANIMATIONS
 
 	def turn_right(self):
-		self.direction = Directions.RIGHT.value
+		self.direction = self.Dirs.RIGHT
 		if self.action < self.NUM_ANIMATIONS:
 			self.action += self.NUM_ANIMATIONS
 # endregion
 
 # region change actions
 	def lick(self):
-		if self.action != Actions.LICK.value and self.action != Actions.LICK.value + self.NUM_ANIMATIONS:
-			self.__change_action(Actions.LICK.value)
+		if self.action != self.Acts.LICK and self.action != self.Acts.LICK + self.NUM_ANIMATIONS:
+			self.__change_action(self.Acts.LICK)
 
 	def walk(self):
-		if self.action != Actions.WALK.value and self.action != Actions.WALK.value + self.NUM_ANIMATIONS:
-			self.__change_action(Actions.WALK.value)
+		if self.action != self.Acts.WALK and self.action != self.Acts.WALK + self.NUM_ANIMATIONS:
+			self.__change_action(self.Acts.WALK)
 
 	def run(self):
-		if self.action != Actions.RUN.value and self.action != Actions.RUN.value + self.NUM_ANIMATIONS:
-			self.__change_action(Actions.RUN.value)
+		if self.action != self.Acts.RUN and self.action != self.Acts.RUN + self.NUM_ANIMATIONS:
+			self.__change_action(self.Acts.RUN)
 
 	def sit(self):
-		if self.action != Actions.SIT.value and self.action != Actions.SIT.value + self.NUM_ANIMATIONS:
-			self.__change_action(Actions.SIT.value)
+		if self.action != self.Acts.SIT and self.action != self.Acts.SIT + self.NUM_ANIMATIONS:
+			self.__change_action(self.Acts.SIT)
 			# transtion from sit to sit idle
 			# @todo: transition currently doesn't take into account animation cooldown
 
 	def sit_idle(self):
-		if self.action != Actions.SIT_IDLE.value and self.action != Actions.SIT_IDLE.value + self.NUM_ANIMATIONS:
-			self.__change_action(Actions.SIT_IDLE.value)
+		if self.action != self.Acts.SIT_IDLE and self.action != self.Acts.SIT_IDLE + self.NUM_ANIMATIONS:
+			self.__change_action(self.Acts.SIT_IDLE)
 
 	def stand(self):
-		if self.action != Actions.STAND.value and self.action != Actions.STAND.value + self.NUM_ANIMATIONS:
-			self.__change_action(Actions.STAND.value)
+		if self.action != self.Acts.STAND and self.action != self.Acts.STAND + self.NUM_ANIMATIONS:
+			self.__change_action(self.Acts.STAND)
 			# transtion from stand to stand idle
 			# @todo: transition currently doesn't take into account animation cooldown
 
 	def stand_idle(self):
-		if self.action != Actions.STAND_IDLE and self.action != Actions.STAND_IDLE.value + self.NUM_ANIMATIONS:
-			self.__change_action(Actions.STAND_IDLE.value)
+		if self.action != self.Acts.STAND_IDLE and self.action != self.Acts.STAND_IDLE + self.NUM_ANIMATIONS:
+			self.__change_action(self.Acts.STAND_IDLE)
 # endregion
 
 # region determine specific direction states
 	def is_facing_left(self):
-		return self.direction == Directions.LEFT.value
+		return self.direction == self.Dirs.LEFT
 
 	def is_facing_right(self):
-		return self.direction == Directions.RIGHT.value
+		return self.direction == self.Dirs.RIGHT
 # endregion
 
 # region determine specific action states
 	def is_sitting(self):
-		return self.action == Actions.SIT_IDLE.value or self.action == Actions.SIT_IDLE.value + self.NUM_ANIMATIONS
+		return self.action == self.Acts.SIT_IDLE or self.action == self.Acts.SIT_IDLE + self.NUM_ANIMATIONS
 
 	def is_standing(self):
-		return self.action == Actions.STAND_IDLE.value or self.action == Actions.STAND_IDLE.value + self.NUM_ANIMATIONS
+		return self.action == self.Acts.STAND_IDLE or self.action == self.Acts.STAND_IDLE + self.NUM_ANIMATIONS
 
 	def is_walking(self):
-		return self.action == Actions.WALK.value or self.action == Actions.WALK.value + self.NUM_ANIMATIONS
+		return self.action == self.Acts.WALK or self.action == self.Acts.WALK + self.NUM_ANIMATIONS
 
 	def is_running(self):
-		return self.action == Actions.RUN.value or self.action == Actions.RUN.value + self.NUM_ANIMATIONS
+		return self.action == self.Acts.RUN or self.action == self.Acts.RUN + self.NUM_ANIMATIONS
 
 	def is_licking(self):
-		return self.action == Actions.LICK.value or self.action == Actions.LICK.value + self.NUM_ANIMATIONS
+		return self.action == self.Acts.LICK or self.action == self.Acts.LICK + self.NUM_ANIMATIONS
 # endregion

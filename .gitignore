@@ -1,2 +1,4 @@
-# don't keep track of pycache
+# don't keep track of pycache or the venv folder
 __pycache__/
+__target__/
+.venv/

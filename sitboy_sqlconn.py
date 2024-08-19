@@ -1,20 +1,20 @@
 #!/usr/bin/env python
 import mysql.connector as conn
 from datetime import datetime
-import dog #for Directions and Actions enums
 
 class SitBoySqlConn():
 
 #region constructors
-	def __init__(self, host, user, password, database):
-		self.db = conn.connect(
-			# @todo: get rid of this and pass it in instead
-			host="localhost",
-			user="root",
-			password="Thug4Lyfe",
-			database="testdb"
-		)
-		self.cursor = self.db.cursor()
+	def __init__(self, host, user, password, database, use_sql):
+		if use_sql:
+			self.db = conn.connect(
+				# @todo: get rid of this and pass it in instead
+				host="localhost",
+				user="root",
+				password="Thug4Lyfe",
+				database="testdb"
+			)
+			self.cursor = self.db.cursor()
 #endregion
 
 #region public functions
