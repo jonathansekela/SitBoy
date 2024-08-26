@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import pyjsdl as pg
+import pygame as pg
 
 class SpriteSheet():
 	def __init__(self, image):

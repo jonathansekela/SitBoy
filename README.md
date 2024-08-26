@@ -3,15 +3,9 @@
 ## Running the Game Without SQL Backend
 In main.py, comment out every line referencing the sqlEventHandler object.
 
-pyjsdl-ts courtesy of **jggatc**
-- github repo: https://github.com/jggatc/pyjsdl-ts
-- website: https://gatc.ca/projects/pyjsdl-ts/
-
 To run the game, you will need to install pygame: https://www.pygame.org/wiki/GettingStarted
 
-Currently working out transcrypt compilation bugs. Ideally, once those are done, navigate to the directory and type the command:
-
-```transcrypt -n main.py```
+```python3 -m main.py```
 
 ## Planning Sheet
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import pyjsdl as pg
+import pygame as pg
 import spritesheet
 import spritesfunctions as sf
 from enum import Enum

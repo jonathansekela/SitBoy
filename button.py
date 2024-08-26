@@ -1,4 +1,4 @@
-import pyjsdl as pg
+import pygame as pg
 
 #button class
 class Button():

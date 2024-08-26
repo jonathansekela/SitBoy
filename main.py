@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
-# import pygame as pg
-import pyjsdl as pg
+import pygame as pg
 from pygame import mixer
 import random
 import button
@@ -205,58 +204,54 @@ action_change_time = 1000 * level_1[0][1]  # milliseconds
 # endregion
 
 # region game loop
-def run():
-	while game_running:
-		# update background
-		screen.blit(BACKGROUND, (0, 0))
+while game_running:
+	# update background
+	screen.blit(BACKGROUND, (0, 0))
 
-		current_time = pg.time.get_ticks()
-		if current_time - last_update >= action_change_time and list_index < len(level_1):
-			goodboi.set_action(level_1[list_index][0])
-			last_update = current_time
-			if USE_SQL:
-				sqlEventHandler.animation_change(TEST_USER_ID, goodboi.get_action())
-			action_change_time = 1000 * level_1[list_index][1]  # milliseconds
-			list_index += 1
-
-		# update animation
-		goodboi.update_animation(screen)
-
-		if list_index >= len(level_1):
-			screen.blit(conclusion_text, conclusion_text_rect)
-			screen.blit(thankyou_text, thankyou_text_rect)
-
-		# event handler
-		for event in pg.event.get():
-
-			if event.type == pg.QUIT:
-				game_running = False
-			if event.type == pg.KEYDOWN:
-				if USE_SQL:
-					sqlEventHandler.user_input(TEST_USER_ID, pg.key.name(event.key), goodboi.get_action(), input_is_correct(event.key, goodboi.is_sitting()))
-				# user action handlers
-				if event.key == pg.K_KP_ENTER or event.key == pg.K_RETURN or event.key == pg.MOUSEBUTTONDOWN or event.key == pg.K_SPACE:
-					if goodboi.is_sitting():
-						reward_fx.play()
-						# @todo: give user feedback on-screen
-					else:
-						error_fx.play()
-						# @todo: give user feedback on-screen
-				# quit game
-				elif event.key == pg.K_ESCAPE:
-					game_running = False
-
-				# @todo: delet this
-				# hit backslash to test experiment-end code
-				elif event.key == pg.K_BACKSLASH:
-					list_index = len(level_1)
-
-		pg.display.update()
-# endregion
-	if session_happening:
+	current_time = pg.time.get_ticks()
+	if current_time - last_update >= action_change_time and list_index < len(level_1):
+		goodboi.set_action(level_1[list_index][0])
+		last_update = current_time
 		if USE_SQL:
-			sqlEventHandler.session_end(TEST_USER_ID)
-	pg.quit()
+			sqlEventHandler.animation_change(TEST_USER_ID, goodboi.get_action())
+		action_change_time = 1000 * level_1[list_index][1]  # milliseconds
+		list_index += 1
 
-images = [BACKGROUND, START_IMG_PATH, STOP_IMG_PATH]
-pg.setup(run, images)
+	# update animation
+	goodboi.update_animation(screen)
+
+	if list_index >= len(level_1):
+		screen.blit(conclusion_text, conclusion_text_rect)
+		screen.blit(thankyou_text, thankyou_text_rect)
+
+	# event handler
+	for event in pg.event.get():
+
+		if event.type == pg.QUIT:
+			game_running = False
+		if event.type == pg.KEYDOWN:
+			if USE_SQL:
+				sqlEventHandler.user_input(TEST_USER_ID, pg.key.name(event.key), goodboi.get_action(), input_is_correct(event.key, goodboi.is_sitting()))
+			# user action handlers
+			if event.key == pg.K_KP_ENTER or event.key == pg.K_RETURN or event.key == pg.MOUSEBUTTONDOWN or event.key == pg.K_SPACE:
+				if goodboi.is_sitting():
+					reward_fx.play()
+					# @todo: give user feedback on-screen
+				else:
+					error_fx.play()
+					# @todo: give user feedback on-screen
+			# quit game
+			elif event.key == pg.K_ESCAPE:
+				game_running = False
+
+			# @todo: delet this
+			# hit backslash to test experiment-end code
+			elif event.key == pg.K_BACKSLASH:
+				list_index = len(level_1)
+
+	pg.display.update()
+# endregion
+if session_happening:
+	if USE_SQL:
+		sqlEventHandler.session_end(TEST_USER_ID)
+pg.quit()
